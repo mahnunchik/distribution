@@ -12,7 +12,9 @@
     "mkdirp": "*",
     "rimraf": "*",
     "underscore": "*",
-    "glob": "*"
+    "glob": "*",
+    "commander": "*",
+    "js-yaml": "*"
   },
   "devDependencies": {
     "coffee-script": "*",

@@ -1,0 +1,41 @@
+#!/usr/bin/env node
+
+var program = require('commander'),
+  fs = require('fs'),
+  path = require('path'),
+  config,
+  map,
+  options;
+
+var yaml = require('js-yaml');
+
+program
+  .version('0.0.1')
+  .option('-c, --config <file>', "config file, defaults to 'distribution.yml'", 'distribution.yml')
+  .option('-m, --map <file>', "output map file, defaults to 'distribution.json'", 'distribution.json')
+  .option('-o, --output <directory>', "directory to move assets, defaults to 'assets'", 'assets')
+  .option('-u, --base-url <url>', "base path to assets, defaults to '/'", '/')
+  .option('-d, --hash', "add hash to name of assets");
+
+program.parse(process.argv);
+
+try {
+  config = yaml.load(fs.readFileSync(program.config, 'utf8'));
+} catch(err){
+  console.error("Invalid config: '"+program.config+"'", err);
+  process.exit(1);
+}
+
+try{
+  map = JSON.parse(fs.readFileSync(program.map, 'utf8'));
+}catch(err){}
+
+distribution = require('../')({
+  assets: map,
+  assetDir: program.output,
+  rootUrl: program.baseUrl
+})
+
+distribution.make(config)
+
+fs.writeFileSync(program.map, JSON.stringify(distribution.assets, null, "\t"))

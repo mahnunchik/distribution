@@ -99,3 +99,11 @@ describe 'Distribution', ()->
           url: 'http://google.com/'
       assert.equal a.get('google'), 'http://google.com/'
 
+    it 'asset by string', ()->
+      a = new Assets({logger: logger})
+      file = 'test/fixtures/test.js'
+      a.make
+        js: file
+      assert.equal a.get('js'), '/test-454d740c0200f454a7e81b3cb06c945f.js'
+      assert.equal fs.existsSync('assets/test-454d740c0200f454a7e81b3cb06c945f.js'), true
+
