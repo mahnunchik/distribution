@@ -7,7 +7,6 @@ glob = require 'glob'
 _ = require 'underscore'
 
 cssProcessor = require './processors/css'
-console.log cssProcessor
 
 
 class Distribution
@@ -22,27 +21,30 @@ class Distribution
   get: (key)->
     return @assets[key]
 
-  make: (key, filename, options)->
+  make: (key, filename, options={})->
     if _.isObject(key)
       for own _key, opts of key
         @make(_key, opts.file, opts)
       return
 
+    if options.url?
+      @assets[key] = options.url
+      return true
+
     unless filename?
       filename = key
 
     files = glob.sync(filename, {mark: true})
+    options.assetDir ?= @assetDir
+    options.rootUrl ?= @rootUrl
     if files.length == 1 and files[0].substr(-1) != '/'
-      options = options || {}
-      options.assetDir ?= @assetDir
-      options.rootUrl ?= @rootUrl
-      return @process(key, files[0], options)
-    else if files.length > 1
+      @process(key, files[0], options)
+    else if files.length > 0
       for file in files
-        @make(file, file, options)
+        if file.substr(-1) != '/'
+          @process(file, file, options)
     else
       @logger.error("Bad pattern: '#{filename}'") if @logger.error
-      return false
 
   process: (key, filename, options={})->
     extname  = path.extname(filename)
@@ -51,9 +53,13 @@ class Distribution
 
     unless fs.existsSync(filename)
       @logger.error("File '#{filename}' not exists") if @logger.error
-      return
+      return false
 
-    content = fs.readFileSync(filename)
+    try
+      content = fs.readFileSync(filename)
+    catch err
+      @logger.error err if @logger.error
+      return false
 
     if @processors[mimetype]?
       content = @processors[mimetype](@, filename, content, options)
@@ -65,7 +71,8 @@ class Distribution
     name = "#{name}#{extname}"
 
     #TODO upload to CDN
-    @assetLocal(options.assetDir, name, content)
+    if @assetLocal(options.assetDir, name, content) == false
+      return false
 
     url = path.join(options.rootUrl, name)
     @assets[key] = url
@@ -74,13 +81,16 @@ class Distribution
     return true
 
   assetLocal: (assetDir, filename, content)->
-    mkdirp.sync(assetDir)
     dest = path.join(assetDir, filename)
-    fs.writeFileSync(dest, content)
+    try
+      mkdirp.sync(assetDir)
+      fs.writeFileSync(dest, content)
+    catch err
+      @logger.error err if @logger.error
+      return false
 
   addProcessor: (mimetype, processor)->
     @processors[mimetype] = processor
-
 
 
 module.exports = new Distribution

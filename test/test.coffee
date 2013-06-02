@@ -83,12 +83,19 @@ describe 'Distribution', ()->
       assert.equal a.get('../fonts/glyphiconshalflings-regular.woff'), '/glyphiconshalflings-regular-b177def5c9d78ab14562ca652b7bed48.woff'
       assert.equal a.get('../fonts/glyphiconshalflings-regular.eot'), '/glyphiconshalflings-regular-5ed8ce6d7757638311ffdaa820021aae.eot'
 
-    it.only 'should asset directory', ()->
+    it 'should asset directory', ()->
       a = new Assets
         logger: logger
       a.make("test/fixtures/**/*.png")
-      console.log a
       assert.notEqual a.get 'test/fixtures/bootstrap/img_old/glyphicons-halflings-white.png', null
       assert.notEqual a.get 'test/fixtures/bootstrap/img_old/glyphicons-halflings.png', null
       assert.notEqual a.get 'test/fixtures/glyphicons-halflings-white.png', null
+
+    it 'asset URL', ()->
+      a = new Assets
+        logger: logger
+      a.make
+        google:
+          url: 'http://google.com/'
+      assert.equal a.get('google'), 'http://google.com/'
 

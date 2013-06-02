@@ -22,7 +22,7 @@ findAssetUrl = (manager, assetPath, cssPath, options)->
     return manager.get(fullPath)
 
   # If not exists try to make asset
-  if manager.make(assetPath, fullPath, options)
+  if manager.process(assetPath, fullPath, options)
     return manager.get(assetPath)
   # Without changes
   return assetPath
