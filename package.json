@@ -1,0 +1,30 @@
+{
+  "name": "distribution",
+  "description": "Asset manager",
+  "version": "0.0.1",
+  "author": "Eugeny Vlasenko <mahnunchik@gmail.com>",
+  "main": "./lib/index.js",
+  "engines": {
+    "node": ">= 0.8.0"
+  },
+  "dependencies": {
+    "mime": "*",
+    "mkdirp": "*",
+    "rimraf": "*",
+    "underscore": "*",
+    "glob": "*"
+  },
+  "devDependencies": {
+    "coffee-script": "*",
+    "coffeelint": "*",
+    "mocha": "*",
+    "markdox": "*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mahnunchik/distribution.git"
+  },
+  "scripts": {
+    "prepublish": "make clean && make all && make lint"
+  }
+}
