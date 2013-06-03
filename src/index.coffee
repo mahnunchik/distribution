@@ -3,8 +3,7 @@ css = require './processors/css'
 
 module.exports = (options={})->
   options.processors ?=
-    processors:
-      'text/css': css
+    'text/css': css
   return new Distribution options
     
 
